@@ -4,7 +4,6 @@ import (
 	"centralService/internal/domain"
 	"centralService/internal/domain/enums"
 	"slices"
-	"strings"
 	"time"
 )
 
@@ -28,9 +27,6 @@ type User struct {
 }
 
 func (u *User) Validate() error {
-	if strings.HasSuffix(u.Email, "@brasiltecpar.com.br") {
-		return domain.ErrUserEmailOutDomain
-	}
 
 	return nil
 }
