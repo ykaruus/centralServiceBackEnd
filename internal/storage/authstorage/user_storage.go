@@ -266,6 +266,59 @@ func (u *UserStorage) UpdateNameAndPicture(c context.Context, id string, name st
 
 }
 
+func (u *UserStorage) UpdateByFilter(ctx context.Context, userID string, euf *entities.UserFilter) error {
+	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
+	defer cancel()
+
+	log := trace.LogWithTraceID("user-storage", ctx).With("method", "UpdateByFilter")
+
+	log.Info("user-storage.Update called")
+
+	idObj, err := bson.ObjectIDFromHex(userID)
+
+	if err != nil {
+		return storage.ErrInvalidUserId
+	}
+
+	query := bson.M{}
+
+	if euf.Email != "" {
+		query["email"] = euf.Email
+	}
+	if euf.Name != "" {
+		query["name"] = euf.Name
+	}
+	if len(euf.Roles) != 0 {
+		query["roles"] = euf.Roles
+	}
+	if euf.LastAccessAt != nil {
+		query["lastAccess_at"] = euf.LastAccessAt
+	}
+	if euf.Picture != "" {
+		query["picture"] = euf.Picture
+	}
+
+	now := time.Now()
+
+	query["updated_at"] = now
+
+	update := bson.D{{Key: "$set", Value: query}}
+
+	opts := options.FindOneAndUpdate()
+
+	err = u.collection.FindOneAndUpdate(ctx, bson.M{"_id": idObj}, update, opts).Err()
+
+	if err != nil {
+		log.Error("user-storage.Update failed", "error", err.Error())
+
+		err := storage.TranslateDBErr(err)
+
+		return err
+	}
+
+	return nil
+}
+
 func (u *UserStorage) Delete(c context.Context, id string) error {
 	return nil
 }

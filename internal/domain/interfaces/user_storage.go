@@ -12,6 +12,7 @@ type UserStorageInterface interface {
 	List(context.Context, *entities.UserFilter) ([]entities.User, error)
 	Delete(context.Context, string) error
 	Update(context.Context, *entities.User) error
+	UpdateByFilter(context.Context, string, *entities.UserFilter) error
 	InitIndexes() error
 	UpdateNameAndPicture(context.Context, string, string, string) error
 }

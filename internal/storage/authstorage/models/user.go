@@ -14,6 +14,7 @@ type User struct {
 	Picture          string                 `bson:"picture"`
 	ID               bson.ObjectID          `bson:"_id,omitempty"`
 	IsFirstLogin     bool                   `bson:"first_login"`
+	LastAccessAt     time.Time              `bson:"lastAccess_at"`
 	AssignedToRegion enums.RegionFlag       `bson:"region_flag"`
 	CreatedAt        time.Time              `bson:"created_at"`
 	UpdatedAt        time.Time              `bson:"updated_at"`

@@ -8,10 +8,12 @@ import (
 )
 
 type UserFilter struct {
-	ID    string
-	Name  string
-	Email string
-	Roles []enums.UserPermission
+	ID           string
+	Name         string
+	Email        string
+	Picture      string
+	LastAccessAt *time.Time
+	Roles        []enums.UserPermission
 }
 
 type User struct {
@@ -21,6 +23,7 @@ type User struct {
 	Roles            []enums.UserPermission
 	AssignedToRegion enums.RegionFlag
 	IsFirstLogin     bool
+	LastAccessAt     time.Time
 	Picture          string
 	CreatedAt        time.Time
 	UpdatedAt        time.Time

@@ -147,3 +147,31 @@ func (u *UserService) UpdateNameAndPicture(ctx context.Context, id string, name 
 
 	return nil
 }
+
+func (u *UserService) UpdateByFilter(ctx context.Context, userID string, euf *entities.UserFilter) error {
+	log := trace.LogWithTraceID("user-service", ctx).With("method", "UpdateByFilter")
+
+	log.Info("calling storage")
+
+	eu := &entities.User{
+		Name:         euf.Email,
+		Picture:      euf.Picture,
+		Roles:        euf.Roles,
+		LastAccessAt: *euf.LastAccessAt,
+		Email:        euf.Email,
+	}
+
+	if err := eu.Validate(); err != nil {
+		return TranslateUserDomainErrors(err)
+	}
+
+	err := u.storage.UpdateByFilter(ctx, userID, euf)
+
+	if err != nil {
+		log.Error("calling storage failed", "error", err.Error())
+		return TranslateStorageErrs(err)
+	}
+
+	return nil
+
+}

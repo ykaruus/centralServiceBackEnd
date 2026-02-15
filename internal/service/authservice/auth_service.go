@@ -5,6 +5,7 @@ import (
 	"centralService/internal/domain/interfaces"
 	"centralService/internal/infra/trace"
 	"context"
+	"time"
 )
 
 type AuthService struct {
@@ -77,11 +78,19 @@ func (as *AuthService) Login(ctx context.Context, u *entities.User) (string, err
 
 		return "", err
 	}
+
+	now := time.Now()
 	log.Info("auth-service.Login update user", "IsFirstLogin?", user.IsFirstLogin)
-	if user.IsFirstLogin == true {
+	if user.LastAccessAt != now || user.Picture == "" || user.Name == "" {
 		log.Info("auth-service.Login updating user")
 
-		err := as.user.UpdateNameAndPicture(ctx, user.ID, u.Name, u.Picture)
+		update := &entities.UserFilter{
+			Name:         u.Name,
+			Picture:      u.Picture,
+			LastAccessAt: &now,
+		}
+
+		err := as.user.UpdateByFilter(ctx, user.ID, update)
 
 		if err != nil {
 			log.Error("auth-service.Login update user failed", "error", err.Error())

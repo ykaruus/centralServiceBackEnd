@@ -31,7 +31,7 @@ func (uf *UserFilter) Validate() error {
 			Code:    response.ErrBadRequest.Code,
 			Message: response.ErrBadRequest.Message,
 			Fields: []string{
-				"Argumentos demais nas querys otário zé mané",
+				"O numero de argumentos excedeu o limite",
 			},
 		})
 	}

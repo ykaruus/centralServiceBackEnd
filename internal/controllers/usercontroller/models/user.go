@@ -20,6 +20,7 @@ type User struct {
 	AssignedToRegion string    `json:"region" validate:"oneof=centro-oeste sul sudeste"`
 	Picture          string    `json:"picture" validate:"omitempty,min=3"`
 	ID               string    `json:"user_id,omitempty" validate:"omitempty"`
+	LastAccessAt     time.Time `json:"lastAccessAt" validate:"omitempty"`
 	CreatedAt        time.Time `json:"createdAt"  validate:"omitempty"`
 	UpdatedAt        time.Time `json:"updatedAt"  validate:"omitempty"`
 }

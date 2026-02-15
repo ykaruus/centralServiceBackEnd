@@ -97,6 +97,7 @@ func ModelsUserToEntityUser(mu *models.User) (*entities.User, error) {
 		Roles:            flags,
 		AssignedToRegion: enums.RemapperRegionFlags[mu.AssignedToRegion],
 		Picture:          mu.Picture,
+		LastAccessAt:     mu.LastAccessAt,
 		CreatedAt:        mu.CreatedAt,
 		UpdatedAt:        mu.UpdatedAt,
 	}, nil
@@ -114,6 +115,7 @@ func EntityUserToModelsUser(eu *entities.User) (*models.User, error) {
 		Picture:          eu.Picture,
 		AssignedToRegion: regionFlag,
 		Name:             eu.Name,
+		LastAccessAt:     eu.LastAccessAt,
 		CreatedAt:        eu.CreatedAt,
 		UpdatedAt:        eu.UpdatedAt,
 	}
