@@ -83,6 +83,99 @@ func (s *EquipmentStorage) Create(context_count context.Context, equipment entit
 	return result.InsertedID.(bson.ObjectID).Hex(), nil
 }
 
+func (eq *EquipmentStorage) UpdateByFilter(c context.Context, f *entities.EquipmentFilter) error {
+	ctx, cancel := context.WithTimeout(c, 10*time.Second)
+
+	defer cancel()
+
+	log := trace.LogWithTraceID("equipment-storage", ctx)
+
+	log.Info("equipment-storage.called", "equipment-filter", f)
+
+	idObj, err := bson.ObjectIDFromHex(f.ID)
+
+	if err != nil {
+		return storage.ErrEquipmentInvalidId
+	}
+	now := time.Now()
+
+	query := bson.M{}
+
+	query["updated_at"] = now
+
+	if f.Name != "" {
+		query["name"] = f.Name
+	}
+	if f.Serial != "" {
+		query["serial"] = f.Serial
+	}
+
+	if f.ShipmentId != "" {
+		if shipmentId, err := bson.ObjectIDFromHex(f.ShipmentId); err == nil {
+			query["current_shipment_id"] = shipmentId
+		}
+
+		return storage.ErrShipmentInvalidID
+	}
+
+	if f.Region != 0 {
+		query["region_flag"] = f.Region
+	}
+
+	if f.Type != 0 {
+		query["type"] = f.Type
+	}
+
+	if f.Status != 0 {
+		query["status"] = f.Status
+	}
+
+	update := bson.D{{Key: "$set", Value: query}}
+
+	opts := options.FindOneAndUpdate()
+
+	err = eq.collection.FindOneAndUpdate(ctx, bson.M{"_id": idObj}, update, opts).Err()
+
+	if err != nil {
+		return storage.TranslateDBErr(err)
+	}
+
+	return nil
+}
+
+func (eq *EquipmentStorage) Replace(c context.Context, ee *entities.Equipment) error {
+
+	ctx, cancel := context.WithTimeout(c, 10*time.Second)
+
+	defer cancel()
+
+	log := trace.LogWithTraceID("equipment-storage", ctx)
+
+	log.Info("equipment-storage.called")
+
+	idObj, err := bson.ObjectIDFromHex(ee.ID)
+
+	if err != nil {
+		return storage.ErrEquipmentInvalidId
+	}
+	now := time.Now()
+	ee.UpdatedAt = now
+
+	em, err := EntityToModel(ee)
+
+	if err != nil {
+		return err
+	}
+
+	err = eq.collection.FindOneAndReplace(ctx, bson.M{"_id": idObj}, em).Err()
+
+	if err != nil {
+		return storage.TranslateDBErr(err)
+	}
+
+	return nil
+}
+
 func (s *EquipmentStorage) GetByID(context_count context.Context, id string) (*entities.Equipment, error) {
 	ctx, cancel := context.WithTimeout(context_count, 10*time.Second)
 	defer cancel()
@@ -110,47 +203,6 @@ func (s *EquipmentStorage) GetByID(context_count context.Context, id string) (*e
 	equipment := ModelToEntity(&result)
 
 	return &equipment, nil
-}
-
-func (s *EquipmentStorage) Patch(context_count context.Context, id string, up bson.M) error {
-	ctx, cancel := context.WithTimeout(context_count, 10*time.Second)
-	defer cancel()
-
-	idObj, err := bson.ObjectIDFromHex(id)
-	if err != nil {
-		return err
-	}
-
-	opts := options.FindOneAndUpdate()
-	update := bson.D{{Key: "$set", Value: up}}
-
-	err = s.collection.FindOneAndUpdate(ctx, bson.M{"_id": idObj}, update, opts).Err()
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (s *EquipmentStorage) Put(context_count context.Context, id string, up bson.M) error {
-	ctx, cancel := context.WithTimeout(context_count, 10*time.Second)
-	defer cancel()
-
-	idObj, err := bson.ObjectIDFromHex(id)
-	if err != nil {
-		return err
-	}
-
-	opts := options.FindOneAndReplace()
-	update := bson.D{{Key: "$set", Value: up}}
-
-	err = s.collection.FindOneAndReplace(ctx, bson.M{"_id": idObj}, update, opts).Err()
-	if err != nil {
-		return err
-	}
-
-	return err
-
 }
 
 func (s *EquipmentStorage) Delete(context_count context.Context, id string) error {

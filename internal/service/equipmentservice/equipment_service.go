@@ -93,3 +93,32 @@ func (es *EquipmentService) ListByRegion(ctx context.Context, region enums.Regio
 
 	return equipments, nil
 }
+
+func (es *EquipmentService) UpdateByFilter(ctx context.Context, ef *entities.EquipmentFilter) error {
+	log := trace.LogWithTraceID("equipment-service", ctx).With("method", "UpdateByFilter")
+
+	log.Info("equipment.service.UpdateByFilter calling")
+
+	err := es.storage.UpdateByFilter(ctx, ef)
+
+	if err != nil {
+		return TranslateStorageErrs(err)
+	}
+
+	return nil
+
+}
+
+func (es *EquipmentService) Replace(ctx context.Context, ef *entities.Equipment) error {
+	log := trace.LogWithTraceID("equipment-service", ctx).With("method", "UpdateByFilter")
+
+	log.Info("equipment.service.ListByRegion calling")
+
+	err := es.Replace(ctx, ef)
+
+	if err != nil {
+		return TranslateStorageErrs(err)
+	}
+
+	return nil
+}

@@ -8,7 +8,6 @@ import (
 
 type EquipmentFilter struct {
 	ID         string
-	ExternalId string
 	Name       string
 	Type       enums.EquipmentType
 	Serial     string

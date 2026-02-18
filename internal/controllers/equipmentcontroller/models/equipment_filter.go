@@ -5,17 +5,21 @@ import (
 	"centralService/internal/domain/enums"
 	"centralService/internal/http/response"
 	"net/http"
+	"time"
 
 	"github.com/go-playground/validator/v10"
 )
 
 type EquipmentFilter struct {
-	ID         string                `query:"id" validate:"len=50,omitempty"`
-	Name       string                `query:"name" validate:"max=50, omitempty"`
-	Type       enums.EquipmentType   `query:"type" validate:"oneof=1 2 3 4 5 6 7, omitempty"`
-	Serial     string                `query:"serial" validate:"max=50, omitempty"`
-	Status     enums.EquipmentStatus `query:"status" validate:"oneof=1 2 3 4 5, omitempty"` // em estoque | enviado | manutenção
-	ShipmentId string                `query:"shipment_id" validate:"omitempty"`             // hex do Shipment
+	ID                string                `json:"id"`
+	Name              string                `json:"name" validate:"max=50,required"`
+	Type              enums.EquipmentType   `json:"type" validate:"oneof=1 2 3 4"`
+	Serial            string                `json:"serial" validate:"max=50,required"`
+	AssignedToRegion  string                `json:"region" validate:"oneof=sudeste centro-oeste sul"`
+	Status            enums.EquipmentStatus `json:"status" validate:"oneof=1 2 3 4 5"`
+	CurrentShipmentId string                `json:"current_shipment_id" validate:"omitempty"` // hex do Shipment
+	CreatedAt         time.Time             `json:"created_at"`
+	UpdatedAt         time.Time             `json:"updated_at"`
 }
 
 func (e *EquipmentFilter) Validate() error {
