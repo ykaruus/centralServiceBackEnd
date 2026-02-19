@@ -126,6 +126,10 @@ func (eq *EquipmentStorage) UpdateByFilter(c context.Context, f *entities.Equipm
 		query["type"] = f.Type
 	}
 
+	if f.Status != 0 {
+		query["status"] = f.Status
+	}
+
 	update := bson.D{{Key: "$set", Value: query}}
 
 	opts := options.FindOneAndUpdate()

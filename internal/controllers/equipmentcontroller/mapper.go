@@ -69,12 +69,16 @@ func EntityRequestToEntity(equipment *models.Equipment) *entities.Equipment {
 	}
 }
 
-func ModelEfToEntitiesEf(mdf models.EquipmentFilter) entities.EquipmentFilter {
-	return entities.EquipmentFilter{
+func ModelEfToEntitiesEf(mdf *models.EquipmentFilter) *entities.EquipmentFilter {
+
+	regionFlag := enums.RemapperRegionFlags[mdf.AssignedToRegion]
+	return &entities.EquipmentFilter{
+		ID:         mdf.ID,
 		Serial:     mdf.Serial,
 		Name:       mdf.Name,
 		Type:       mdf.Type,
 		Status:     mdf.Status,
-		ShipmentId: mdf.ShipmentId,
+		ShipmentId: mdf.CurrentShipmentId,
+		Region:     regionFlag,
 	}
 }

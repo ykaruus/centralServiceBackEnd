@@ -77,10 +77,10 @@ func (ec *EquipmentController) List(ctx *gin.Context) {
 	traceID := gen.GetTraceIDFromCtx(ctx)
 	context := gen.CtxWithValue(ctx.Request.Context(), traceID)
 
-	equipmentFilter := models.EquipmentFilter{
-		Name:       ctx.Query("name"),
-		Serial:     ctx.Query("serial"),
-		ShipmentId: ctx.Query("shipmentId"),
+	equipmentFilter := &models.EquipmentFilter{
+		Name:              ctx.Query("name"),
+		Serial:            ctx.Query("serial"),
+		CurrentShipmentId: ctx.Query("shipmentId"),
 	}
 
 	log := trace.LogWithTraceID("equipment-controller", context).With("method", "List")
@@ -158,7 +158,7 @@ func (ec *EquipmentController) List(ctx *gin.Context) {
 	equipments := make([]entities.Equipment, 0)
 
 	if err := user.HasPermission(enums.USER_PERMISSION_COORDINATOR); err == nil {
-		equipments, err = ec.service.List(context, ModelEfToEntitiesEf(equipmentFilter))
+		equipments, err = ec.service.List(context, *ModelEfToEntitiesEf(equipmentFilter))
 
 		if err != nil {
 
